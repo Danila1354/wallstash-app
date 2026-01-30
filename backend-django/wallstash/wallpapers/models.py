@@ -16,7 +16,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name_plural = "Categories"
 
@@ -57,9 +57,9 @@ class Wallpaper(models.Model):
     def __str__(self):
         return self.title
 
+
 @receiver(pre_save, sender=Wallpaper)
 def generate_slug(sender, instance, **kwargs):
-
     if not instance.slug:
         base_slug = slugify(instance.title)
         instance.slug = f"{base_slug}-{uuid.uuid4().hex[:8]}"

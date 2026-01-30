@@ -17,7 +17,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
-
+from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView, SpectacularAPIView
 
 
 urlpatterns = [
@@ -26,6 +26,10 @@ urlpatterns = [
         path('', include('wallpapers.urls')),
         path('auth/', include('djoser.urls')),
         path('auth/', include('djoser.urls.jwt')),
+        path('schema/', SpectacularAPIView.as_view(), name='schema'),
+        # Optional UI:
+        path('schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+        path('schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     ])),
     
 ]

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework_simplejwt',
     'djoser',
+    'drf_spectacular',
 
     'users',
     'wallpapers',
@@ -161,7 +162,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # REST Framework
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'WallStash API',
+    'DESCRIPTION': 'API documentation for WallStash',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }

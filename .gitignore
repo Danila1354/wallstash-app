@@ -135,11 +135,11 @@ dump.rdb
 *.swp
 *~
 
-# Uploaded media files (optional - закомментируй если хочешь коммитить тестовые картинки)
-# media/
-# uploads/
+# Uploaded media files
+media/
+uploads/
 
-# Migrations (optional - обычно коммитят, но можно игнорировать если работаешь один)
+# Migrations
 # */migrations/*.py
 # !*/migrations/__init__.py
 

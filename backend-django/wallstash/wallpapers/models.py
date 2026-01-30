@@ -1,3 +1,51 @@
+from PIL import Image
+import uuid
+from django.conf import settings
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from django.utils.text import slugify
+from taggit.managers import TaggableManager
 
-# Create your models here.
+from .utils import wallpaper_upload_to
+
+
+class Wallpaper(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="wallpapers"
+    )
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, blank=True)
+    image = models.ImageField(upload_to=wallpaper_upload_to)
+    tags = TaggableManager(blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    likes = models.PositiveIntegerField(default=0)
+    downloads = models.PositiveIntegerField(default=0)
+    width = models.PositiveIntegerField(blank=True)
+    height = models.PositiveIntegerField(blank=True)
+    file_size = models.PositiveBigIntegerField(blank=True)
+
+    @property
+    def orientation(self):
+        return "landscape" if self.width >= self.height else "portrait"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            self.slug = f"{base_slug}-{uuid.uuid4().hex[:8]}"
+        if self.image:
+            self.file_size = self.image.size
+            img = Image.open(self.image)
+            self.width, self.height = img.size
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+
+@receiver(pre_save, sender=Wallpaper)
+def generate_slug(sender, instance, **kwargs):
+
+    if not instance.slug:
+        base_slug = slugify(instance.title)
+        instance.slug = f"{base_slug}-{uuid.uuid4().hex[:8]}"

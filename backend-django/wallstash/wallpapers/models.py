@@ -10,6 +10,17 @@ from taggit.managers import TaggableManager
 from .utils import wallpaper_upload_to
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(unique=True)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name_plural = "Categories"
+
+
 class Wallpaper(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="wallpapers"
@@ -17,6 +28,9 @@ class Wallpaper(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     image = models.ImageField(upload_to=wallpaper_upload_to)
+    category = models.ForeignKey(
+        Category, on_delete=models.PROTECT, related_name="wallpapers"
+    )
     tags = TaggableManager(blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

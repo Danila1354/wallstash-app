@@ -9,17 +9,34 @@ class WallpaperSerializer(TaggitSerializer, serializers.ModelSerializer):
     tags = TagListSerializerField()
     file_size_human = serializers.SerializerMethodField()
     liked_by_user = serializers.SerializerMethodField()
+    username = serializers.SerializerMethodField()
 
     class Meta:
         model = Wallpaper
         fields = [
             "id",
             "user",
+            "username",
             "title",
             "slug",
             "image",
             "category",
             "tags",
+            "uploaded_at",
+            "updated_at",
+            "likes_count",
+            "downloads_count",
+            "width",
+            "height",
+            "file_size_human",
+            "orientation",
+            "liked_by_user",
+        ]
+        read_only_fields = [
+            "id",
+            "user",
+            "username",
+            "slug",
             "uploaded_at",
             "updated_at",
             "likes_count",
@@ -37,3 +54,6 @@ class WallpaperSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     def get_file_size_human(self, obj):
         return filesizeformat(obj.file_size)
+    
+    def get_username(self, obj):
+        return obj.user.username

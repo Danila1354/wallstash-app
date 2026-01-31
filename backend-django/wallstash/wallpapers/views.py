@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from .models import WallpaperLike
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwnerOrReadOnly
 
 
 class WallpaperViewSet(viewsets.ReadOnlyModelViewSet):
@@ -22,9 +23,9 @@ class WallpaperViewSet(viewsets.ReadOnlyModelViewSet):
                     "wallpaper_id", flat=True
                 )
             )
-            context['user_likes'] = liked_ids
+            context["user_likes"] = liked_ids
         else:
-            context['user_likes'] = set()
+            context["user_likes"] = set()
         return context
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
@@ -39,18 +40,24 @@ class WallpaperViewSet(viewsets.ReadOnlyModelViewSet):
                 wallpaper=wallpaper
             ).count()
             wallpaper.save(update_fields=["likes_count"])
-            return Response({
+            return Response(
+                {
+                    "success": True,
+                    "message": "Wallpaper liked.",
+                    "likes_count": wallpaper.likes_count,
+                    "liked_by_user": True,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(
+            {
                 "success": True,
-                "message": "Wallpaper liked.",
+                "message": "You have already liked this wallpaper.",
                 "likes_count": wallpaper.likes_count,
-                "liked_by_user": True
-            }, status=status.HTTP_201_CREATED)
-        return Response({
-            "success": True,
-            "message": "You have already liked this wallpaper.",
-            "likes_count": wallpaper.likes_count,
-            "liked_by_user": True
-        }, status=status.HTTP_200_OK)
+                "liked_by_user": True,
+            },
+            status=status.HTTP_200_OK,
+        )
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def unlike(self, request, slug=None):
@@ -63,16 +70,32 @@ class WallpaperViewSet(viewsets.ReadOnlyModelViewSet):
                 wallpaper=wallpaper
             ).count()
             wallpaper.save(update_fields=["likes_count"])
-            return Response({
-                "success": True,
-                "message": "Wallpaper unliked.",
-                "likes_count": wallpaper.likes_count,
-                "liked_by_user": False
-            }, status=status.HTTP_200_OK)
+            return Response(
+                {
+                    "success": True,
+                    "message": "Wallpaper unliked.",
+                    "likes_count": wallpaper.likes_count,
+                    "liked_by_user": False,
+                },
+                status=status.HTTP_200_OK,
+            )
         except WallpaperLike.DoesNotExist:
-            return Response({
-                "success": False,
-                "message": "You have not liked this wallpaper.",
-                "likes_count": wallpaper.likes_count,
-                "liked_by_user": False
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {
+                    "success": False,
+                    "message": "You have not liked this wallpaper.",
+                    "likes_count": wallpaper.likes_count,
+                    "liked_by_user": False,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+class ProfileWallpaperViewSet(viewsets.ModelViewSet):
+    serializer_class = WallpaperSerializer
+    permission_classes = [IsOwnerOrReadOnly]
+    lookup_field = "slug"
+
+    def get_queryset(self):
+        user_id = self.kwargs.get("user_id")
+        return Wallpaper.objects.filter(user_id=user_id).order_by("-uploaded_at")

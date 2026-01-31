@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'djoser',
     'drf_spectacular',
-
+    
     'users',
     'wallpapers',
     'rest_framework',

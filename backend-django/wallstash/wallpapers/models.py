@@ -34,8 +34,8 @@ class Wallpaper(models.Model):
     tags = TaggableManager(blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    likes = models.PositiveIntegerField(default=0)
-    downloads = models.PositiveIntegerField(default=0)
+    likes_count = models.PositiveIntegerField(default=0)
+    downloads_count = models.PositiveIntegerField(default=0)
     width = models.PositiveIntegerField(blank=True)
     height = models.PositiveIntegerField(blank=True)
     file_size = models.PositiveBigIntegerField(blank=True)
@@ -45,9 +45,6 @@ class Wallpaper(models.Model):
         return "landscape" if self.width >= self.height else "portrait"
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            base_slug = slugify(self.title)
-            self.slug = f"{base_slug}-{uuid.uuid4().hex[:8]}"
         if self.image:
             self.file_size = self.image.size
             img = Image.open(self.image)
@@ -58,8 +55,31 @@ class Wallpaper(models.Model):
         return self.title
 
 
+
 @receiver(pre_save, sender=Wallpaper)
 def generate_slug(sender, instance, **kwargs):
     if not instance.slug:
         base_slug = slugify(instance.title)
         instance.slug = f"{base_slug}-{uuid.uuid4().hex[:8]}"
+
+
+class WallpaperLike(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='wallpaper_likes'
+    )
+    wallpaper = models.ForeignKey(
+        Wallpaper,
+        on_delete=models.CASCADE,
+        related_name='liked_by'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'wallpaper'],
+                name='unique_user_wallpaper_like'
+            )
+        ]

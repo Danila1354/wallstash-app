@@ -10,8 +10,8 @@ class WallpaperAdmin(admin.ModelAdmin):
         "user",
         "category",
         "uploaded_at",
-        "likes",
-        "downloads",
+        "likes_count",
+        "downloads_count",
         "resolution",
         "file_size_human",
     )
@@ -20,8 +20,8 @@ class WallpaperAdmin(admin.ModelAdmin):
     list_filter = ("uploaded_at", "category", "tags")
     exclude = ("width", "height", "file_size")
     readonly_fields = (
-        "likes",
-        "downloads",
+        "likes_count",
+        "downloads_count",
         "slug",
         "uploaded_at",
         "updated_at",
@@ -46,8 +46,8 @@ class WallpaperAdmin(admin.ModelAdmin):
             "Statistics",
             {
                 "fields": (
-                    "likes",
-                    "downloads",
+                    "likes_count",
+                    "downloads_count",
                 )
             },
         ),

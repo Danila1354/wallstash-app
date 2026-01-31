@@ -152,6 +152,10 @@ AUTHENTICATION_BACKENDS = [
 ]
 DJOSER = {
     'USER_CREATE_PASSWORD_RETYPE': True,
+    'SERIALIZERS': {
+        'user': 'users.serializers.UserSerializer',
+        'current_user': 'users.serializers.UserSerializer',
+    },
     'LOGIN_FIELD': 'username',
 }
 

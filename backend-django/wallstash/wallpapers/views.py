@@ -8,12 +8,11 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerOrReadOnly
 
-
 class WallpaperViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Wallpaper.objects.all().order_by("-uploaded_at")
+    
+    queryset = Wallpaper.objects.all().select_related('user').order_by("-uploaded_at")
     serializer_class = WallpaperSerializer
     lookup_field = "slug"
-
     def get_serializer_context(self):
         context = super().get_serializer_context()
         user = self.request.user
@@ -30,6 +29,7 @@ class WallpaperViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def like(self, request, slug=None):
+        """Поставить лайк обою."""
         wallpaper = self.get_object()
         user = request.user
         like, created = WallpaperLike.objects.get_or_create(
@@ -61,6 +61,7 @@ class WallpaperViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def unlike(self, request, slug=None):
+        """Убрать лайк с обоя."""
         wallpaper = self.get_object()
         user = request.user
         try:
@@ -95,8 +96,8 @@ class ProfileWallpaperViewSet(viewsets.ModelViewSet):
     serializer_class = WallpaperSerializer
     permission_classes = [IsOwnerOrReadOnly]
     lookup_field = "slug"
-
     def get_queryset(self):
-        user_id = self.kwargs.get("user_id")
+        
+        user_id = self.kwargs.get("user_pk")
         return Wallpaper.objects.filter(user_id=user_id).order_by("-uploaded_at")
 

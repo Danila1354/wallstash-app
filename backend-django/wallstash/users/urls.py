@@ -1,35 +1,21 @@
 from django.urls import path
 from wallpapers.views import ProfileWallpaperViewSet
 from .views import UserProfileView
+from rest_framework_nested import routers
 
-urlpatterns = [
-    path(
-        '<int:user_id>/',
-        UserProfileView.as_view({
-            'get': 'retrieve',
-            'put': 'update',
-            'patch': 'partial_update',
-            'delete': 'destroy'
-        }),
-        name='user-profile'
-    ),
+router = routers.DefaultRouter()
+router.register('profile', UserProfileView, basename='profile')
 
-    path(
-        '<int:user_id>/wallpapers/',
-        ProfileWallpaperViewSet.as_view({
-            'get': 'list',
-            'post': 'create'
-        }),
-        name='user-wallpapers'
-    ),
-    path(
-        '<int:user_id>/wallpapers/<slug:slug>/',
-        ProfileWallpaperViewSet.as_view({
-            'get': 'retrieve',
-            'put': 'update',
-            'patch': 'partial_update',
-            'delete': 'destroy'
-        }),
-        name='user-wallpaper-detail'
-    ),
-]
+profile_router = routers.NestedDefaultRouter(
+    router,
+    'profile',
+    lookup='user'
+)
+
+profile_router.register(
+    'wallpapers',
+    ProfileWallpaperViewSet,
+    basename='user-wallpapers'
+)
+
+urlpatterns = router.urls + profile_router.urls

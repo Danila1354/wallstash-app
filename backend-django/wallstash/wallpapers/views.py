@@ -113,7 +113,6 @@ class ProfileWallpaperViewSet(viewsets.ModelViewSet):
     serializer_class = WallpaperSerializer
     permission_classes = [IsOwnerOrReadOnly]
     lookup_field = "slug"
-    http_method_names = ["get", "post", "patch", "delete"]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

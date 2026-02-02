@@ -1,3 +1,4 @@
+from rest_framework.reverse import reverse
 from rest_framework import serializers
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 from django.template.defaultfilters import filesizeformat
@@ -10,16 +11,22 @@ class WallpaperSerializer(TaggitSerializer, serializers.ModelSerializer):
     file_size_human = serializers.SerializerMethodField()
     liked_by_user = serializers.SerializerMethodField()
     username = serializers.SerializerMethodField()
+    image_preview = serializers.ImageField(read_only=True)
+    detail_link = serializers.SerializerMethodField()
+    download_link = serializers.SerializerMethodField()
 
     class Meta:
         model = Wallpaper
         fields = [
             "id",
+            "detail_link",
+            "download_link",
             "user",
             "username",
             "title",
             "slug",
             "image",
+            "image_preview",
             "category",
             "tags",
             "uploaded_at",
@@ -34,8 +41,11 @@ class WallpaperSerializer(TaggitSerializer, serializers.ModelSerializer):
         ]
         read_only_fields = [
             "id",
+            "detail_link",
+            "download_link",
             "user",
             "username",
+            "image_preview",
             "slug",
             "uploaded_at",
             "updated_at",
@@ -47,40 +57,34 @@ class WallpaperSerializer(TaggitSerializer, serializers.ModelSerializer):
             "orientation",
             "liked_by_user",
         ]
-    
+
     def get_liked_by_user(self, obj):
-        user_likes = self.context.get('user_likes', set())
+        user_likes = self.context.get("user_likes", set())
         return obj.id in user_likes
 
     def get_file_size_human(self, obj):
         return filesizeformat(obj.file_size)
-    
+
     def get_username(self, obj):
         return obj.user.username
-    
+
+    def get_detail_link(self, obj):
+        request = self.context.get("request")
+        if request:
+            return request.build_absolute_uri(obj.get_absolute_url())
+        return obj.get_absolute_url()
+
+    def get_download_link(self, obj):
+        request = self.context.get("request")
+        return reverse("wallpaper-download", kwargs={"slug": obj.slug}, request=request)
+
 
 class CommentSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
-        source="user.username",
-        read_only=True
-    )
-    first_name = serializers.CharField(
-        source="user.first_name",
-        read_only=True
-    )
-    last_name = serializers.CharField(
-        source="user.last_name",
-        read_only=True
-    )
+    username = serializers.CharField(source="user.username", read_only=True)
+    first_name = serializers.CharField(source="user.first_name", read_only=True)
+    last_name = serializers.CharField(source="user.last_name", read_only=True)
 
     class Meta:
         model = Comment
-        fields = [
-            "id",
-            "username",
-            "first_name",
-            "last_name",
-            "text",
-            "created_at"
-        ]
+        fields = ["id", "username", "first_name", "last_name", "text", "created_at"]
         read_only_fields = ["created_at", "id"]

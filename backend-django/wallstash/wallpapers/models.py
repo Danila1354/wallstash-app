@@ -4,8 +4,11 @@ from django.conf import settings
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.urls import reverse
 from django.utils.text import slugify
 from taggit.managers import TaggableManager
+from imagekit.models import ImageSpecField
+from imagekit.processors import ResizeToFit
 
 from .utils import wallpaper_upload_to
 
@@ -28,6 +31,12 @@ class Wallpaper(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     image = models.ImageField(upload_to=wallpaper_upload_to)
+    image_preview = ImageSpecField(
+        source="image",
+        processors=[ResizeToFit(800, 800)],
+        format="JPEG",
+        options={"quality": 75},
+    )
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, related_name="wallpapers"
     )
@@ -50,6 +59,10 @@ class Wallpaper(models.Model):
             img = Image.open(self.image)
             self.width, self.height = img.size
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("wallpaper-detail", kwargs={"slug": self.slug})
+    
 
     def __str__(self):
         return self.title

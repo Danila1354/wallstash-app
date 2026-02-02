@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from .permissions import IsSelfOrReadOnly
 from .serializers import UserProfileSerializer
 from .models import UserFollow
+from wallpapers.models import Wallpaper
+from wallpapers.serializers import WallpaperSerializer
 
 User = get_user_model()
 
@@ -120,4 +122,12 @@ class UserProfileView(viewsets.ModelViewSet):
         """Список пользователей, на которых подписан текущий пользователь."""
         following = request.user.following.all()
         serializer = UserProfileSerializer(following, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=["get"])
+    def wallpapers(self, request, pk=None):
+        """Список обоев пользователя"""
+        user = self.get_object()
+        wallpapers = Wallpaper.objects.filter(user=user).order_by("-uploaded_at")
+        serializer = WallpaperSerializer(wallpapers, many=True, context={"request": request})
         return Response(serializer.data)

@@ -108,20 +108,6 @@ class WallpaperViewSet(viewsets.ReadOnlyModelViewSet):
             filename=wallpaper.image.name.split("/")[-1],
         )
 
-
-class ProfileWallpaperViewSet(viewsets.ModelViewSet):
-    serializer_class = WallpaperSerializer
-    permission_classes = [IsOwnerOrReadOnly]
-    lookup_field = "slug"
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def get_queryset(self):
-        user_id = self.kwargs.get("user_pk")
-        return Wallpaper.objects.filter(user_id=user_id).order_by("-uploaded_at")
-
-
 class CommentViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,

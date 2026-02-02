@@ -55,7 +55,6 @@ class Wallpaper(models.Model):
         return self.title
 
 
-
 @receiver(pre_save, sender=Wallpaper)
 def generate_slug(sender, instance, **kwargs):
     if not instance.slug:
@@ -67,19 +66,27 @@ class WallpaperLike(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='wallpaper_likes'
+        related_name="wallpaper_likes",
     )
     wallpaper = models.ForeignKey(
-        Wallpaper,
-        on_delete=models.CASCADE,
-        related_name='liked_by'
+        Wallpaper, on_delete=models.CASCADE, related_name="liked_by"
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'wallpaper'],
-                name='unique_user_wallpaper_like'
+                fields=["user", "wallpaper"], name="unique_user_wallpaper_like"
             )
         ]
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="comments"
+    )
+    wallpaper = models.ForeignKey(
+        Wallpaper, on_delete=models.CASCADE, related_name="comments"
+    )
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)

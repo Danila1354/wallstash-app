@@ -6,7 +6,7 @@ User = get_user_model()
 
 class UsernameOrEmailBackend(ModelBackend):
     """
-    Custom authentication backend that allows users to log in using either their
+    Аутентифицирует по email либо username
     """
     def authenticate(self, request, username=None, password=None, **kwargs):
         try:

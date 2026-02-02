@@ -2,7 +2,7 @@ from rest_framework import serializers
 from taggit.serializers import TagListSerializerField, TaggitSerializer
 from django.template.defaultfilters import filesizeformat
 
-from .models import Wallpaper
+from .models import Wallpaper, Comment
 
 
 class WallpaperSerializer(TaggitSerializer, serializers.ModelSerializer):
@@ -57,3 +57,20 @@ class WallpaperSerializer(TaggitSerializer, serializers.ModelSerializer):
     
     def get_username(self, obj):
         return obj.user.username
+    
+
+class CommentSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        source="user.username",
+        read_only=True
+    )
+    class Meta:
+        model = Comment
+        fields = [
+            "id",
+            "username",
+            "wallpaper",
+            "text",
+            "created_at"
+        ]
+        read_only_fields = ["user", "wallpaper"]

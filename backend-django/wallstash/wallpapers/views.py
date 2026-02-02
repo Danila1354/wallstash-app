@@ -1,18 +1,21 @@
-from .models import Wallpaper
 from rest_framework import viewsets
-from .serializers import WallpaperSerializer
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from .models import WallpaperLike
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework import mixins
+from django.shortcuts import get_object_or_404
+
+from .serializers import CommentSerializer, WallpaperSerializer
+from .models import WallpaperLike, Wallpaper, Comment
 from .permissions import IsOwnerOrReadOnly
 
+
 class WallpaperViewSet(viewsets.ReadOnlyModelViewSet):
-    
-    queryset = Wallpaper.objects.all().select_related('user').order_by("-uploaded_at")
+    queryset = Wallpaper.objects.all().select_related("user").order_by("-uploaded_at")
     serializer_class = WallpaperSerializer
     lookup_field = "slug"
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         user = self.request.user
@@ -96,8 +99,28 @@ class ProfileWallpaperViewSet(viewsets.ModelViewSet):
     serializer_class = WallpaperSerializer
     permission_classes = [IsOwnerOrReadOnly]
     lookup_field = "slug"
+
     def get_queryset(self):
-        
         user_id = self.kwargs.get("user_pk")
         return Wallpaper.objects.filter(user_id=user_id).order_by("-uploaded_at")
 
+
+class CommentViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+    def get_queryset(self):
+        return (
+            Comment.objects.filter(wallpaper__slug=self.kwargs["wallpaper_slug"])
+            .select_related("user")
+            .order_by("created_at")
+        )
+
+    def perform_create(self, serializer):
+        wallpaper = get_object_or_404(Wallpaper, slug=self.kwargs["wallpaper_slug"])
+        serializer.save(user=self.request.user, wallpaper=wallpaper)

@@ -1,10 +1,12 @@
-from rest_framework.routers import DefaultRouter
-from django.urls import path, include
-from .views import WallpaperViewSet, ProfileWallpaperViewSet
+from rest_framework_nested import routers
 
-router = DefaultRouter()
+from .views import WallpaperViewSet, CommentViewSet
+
+router = routers.DefaultRouter()
 router.register(r'wallpapers', WallpaperViewSet, basename='wallpaper')
+wallpaper_router = routers.NestedDefaultRouter(router, 'wallpapers',lookup='wallpaper')
 
-urlpatterns = [
-    path('', include(router.urls)),
-]
+wallpaper_router.register('comments',CommentViewSet,basename='wallpaper-comment')
+
+
+urlpatterns = router.urls + wallpaper_router.urls

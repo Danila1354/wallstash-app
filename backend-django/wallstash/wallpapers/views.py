@@ -13,10 +13,11 @@ from .models import WallpaperLike, Wallpaper, Comment
 from .permissions import IsOwnerOrReadOnly
 
 
-class WallpaperViewSet(viewsets.ReadOnlyModelViewSet):
+class WallpaperViewSet(viewsets.ModelViewSet):
     queryset = Wallpaper.objects.all().select_related("user").order_by("-uploaded_at")
     serializer_class = WallpaperSerializer
     lookup_field = "slug"
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

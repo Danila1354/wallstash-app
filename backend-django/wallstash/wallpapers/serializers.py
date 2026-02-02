@@ -8,12 +8,12 @@ from .models import Wallpaper, Comment
 
 class WallpaperSerializer(TaggitSerializer, serializers.ModelSerializer):
     tags = TagListSerializerField()
-    file_size_human = serializers.SerializerMethodField()
-    liked_by_user = serializers.SerializerMethodField()
-    username = serializers.SerializerMethodField()
+    file_size_human = serializers.SerializerMethodField(read_only=True)
+    liked_by_user = serializers.SerializerMethodField(read_only=True)
+    username = serializers.SerializerMethodField(read_only=True)
     image_preview = serializers.ImageField(read_only=True)
-    detail_link = serializers.SerializerMethodField()
-    download_link = serializers.SerializerMethodField()
+    detail_link = serializers.SerializerMethodField(read_only=True)
+    download_link = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Wallpaper
@@ -41,11 +41,7 @@ class WallpaperSerializer(TaggitSerializer, serializers.ModelSerializer):
         ]
         read_only_fields = [
             "id",
-            "detail_link",
-            "download_link",
             "user",
-            "username",
-            "image_preview",
             "slug",
             "uploaded_at",
             "updated_at",
@@ -53,9 +49,7 @@ class WallpaperSerializer(TaggitSerializer, serializers.ModelSerializer):
             "downloads_count",
             "width",
             "height",
-            "file_size_human",
             "orientation",
-            "liked_by_user",
         ]
 
     def get_liked_by_user(self, obj):

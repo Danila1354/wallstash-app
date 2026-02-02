@@ -22,6 +22,7 @@ from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView, 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api-auth/', include('rest_framework.urls')),
     path('api/v1/', include([
         path('', include('wallpapers.urls')),
         path('', include('users.urls')),

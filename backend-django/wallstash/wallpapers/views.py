@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import mixins
 from django.shortcuts import get_object_or_404
+from django.db.models import F
+from django.http import FileResponse
 
 from .serializers import CommentSerializer, WallpaperSerializer
 from .models import WallpaperLike, Wallpaper, Comment
@@ -94,11 +96,27 @@ class WallpaperViewSet(viewsets.ReadOnlyModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+    @action(detail=True, methods=["get"], permission_classes=[IsAuthenticated])
+    def download(self, request, slug=None):
+        wallpaper = self.get_object()
+        Wallpaper.objects.filter(slug=wallpaper.slug).update(
+            downloads_count=F("downloads_count") + 1
+        )
+        return FileResponse(
+            wallpaper.image.open("rb"),
+            as_attachment=True,
+            filename=wallpaper.image.name.split("/")[-1],
+        )
+
 
 class ProfileWallpaperViewSet(viewsets.ModelViewSet):
     serializer_class = WallpaperSerializer
     permission_classes = [IsOwnerOrReadOnly]
     lookup_field = "slug"
+    http_method_names = ["get", "post", "patch", "delete"]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     def get_queryset(self):
         user_id = self.kwargs.get("user_pk")

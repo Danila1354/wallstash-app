@@ -19,14 +19,14 @@ class WallpaperSerializer(TaggitSerializer, serializers.ModelSerializer):
         model = Wallpaper
         fields = [
             "id",
-            "detail_link",
-            "download_link",
-            "user",
-            "username",
             "title",
             "slug",
+            "user",
+            "username",
             "image",
             "image_preview",
+            "detail_link",
+            "download_link",
             "category",
             "tags",
             "uploaded_at",

@@ -108,6 +108,7 @@ class WallpaperViewSet(viewsets.ReadOnlyModelViewSet):
             filename=wallpaper.image.name.split("/")[-1],
         )
 
+
 class CommentViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,

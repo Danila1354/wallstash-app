@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'users',
     'wallpapers',
     'rest_framework',
-    'taggit'
+    'taggit',
+    'wallpaper_collections'
 
 ]
 

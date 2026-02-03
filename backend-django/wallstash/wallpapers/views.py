@@ -17,7 +17,6 @@ class WallpaperViewSet(viewsets.ModelViewSet):
     queryset = Wallpaper.objects.all().select_related("user").order_by("-uploaded_at")
     serializer_class = WallpaperSerializer
     lookup_field = "slug"
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -33,9 +32,17 @@ class WallpaperViewSet(viewsets.ModelViewSet):
             context["user_likes"] = set()
         return context
 
+    def get_permissions(self):
+        if self.action == "create":
+            return [IsAuthenticated()]
+        return [IsOwnerOrReadOnly()]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def like(self, request, slug=None):
-        """Поставить лайк обою."""
+        """Поставить лайк обоям."""
         wallpaper = self.get_object()
         user = request.user
         like, created = WallpaperLike.objects.get_or_create(
@@ -67,7 +74,7 @@ class WallpaperViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def unlike(self, request, slug=None):
-        """Убрать лайк с обоя."""
+        """Убрать лайк с обоев."""
         wallpaper = self.get_object()
         user = request.user
         try:

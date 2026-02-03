@@ -82,3 +82,18 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ["id", "username", "first_name", "last_name", "text", "created_at"]
         read_only_fields = ["created_at", "id"]
+
+
+class AddWallpaperSerializer(serializers.Serializer):
+    wallpaper_id = serializers.IntegerField()
+
+class UploadWallpaperSerializer(serializers.ModelSerializer):
+    tags = TagListSerializerField()
+    class Meta:
+        model = Wallpaper
+        fields = [
+            "title",
+            "image",
+            "category",
+            "tags",
+        ]

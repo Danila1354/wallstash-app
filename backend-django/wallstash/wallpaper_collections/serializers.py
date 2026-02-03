@@ -18,3 +18,4 @@ class CollectionSerializer(serializers.ModelSerializer):
             qs = qs[:5]
         serializer = WallpaperSerializer(qs, many=True, context=self.context)
         return serializer.data
+

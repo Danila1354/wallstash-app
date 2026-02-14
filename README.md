@@ -25,7 +25,7 @@
 1. **Клонировать репозиторий**
 ```bash
 git clone https://github.com/yourusername/wallstash.git
-cd wallstash-app/backend-django
+cd wallstash-app/backend-django/wallstash
 ```
 
 2. **Создать виртуальное окружение и установить зависимости**

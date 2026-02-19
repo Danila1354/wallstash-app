@@ -48,11 +48,11 @@ GRANT ALL PRIVILEGES ON DATABASE wallstash TO wallstash_user;
 ```env
 SECRET_KEY=your-secret-key
 DEBUG=True
-DATABASE_NAME=wallstash
-DATABASE_USER=wallstash_user
-DATABASE_PASSWORD=your_password
-DATABASE_HOST=localhost
-DATABASE_PORT=5432
+DB_NAME=wallstash
+DB_USER=wallstash_user
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_PORT=5432
 ```
 
 5. **Применить миграции и создать суперпользователя**

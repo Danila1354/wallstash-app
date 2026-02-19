@@ -46,7 +46,7 @@ GRANT ALL PRIVILEGES ON DATABASE wallstash TO wallstash_user;
 
 Создайте файл `.env` в папке backend-django/wallstash:
 ```env
-SECRET_KEY=your-secret-key
+DJANGO_SECRET_KEY=your-secret-key
 DEBUG=True
 DB_NAME=wallstash
 DB_USER=wallstash_user

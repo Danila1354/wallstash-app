@@ -7,16 +7,22 @@ from rest_framework import mixins
 from django.shortcuts import get_object_or_404
 from django.db.models import F
 from django.http import FileResponse
+from rest_framework.filters import SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import CommentSerializer, WallpaperSerializer
 from .models import WallpaperLike, Wallpaper, Comment
 from .permissions import IsOwnerOrReadOnly
+from .filters import WallpaperFilter
 
 
 class WallpaperViewSet(viewsets.ModelViewSet):
     queryset = Wallpaper.objects.all().select_related("user").order_by("-uploaded_at")
     serializer_class = WallpaperSerializer
     lookup_field = "slug"
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_class = WallpaperFilter
+    search_fields = ["title", "tags__name"]
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

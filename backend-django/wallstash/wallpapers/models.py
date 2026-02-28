@@ -29,7 +29,7 @@ class Wallpaper(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="wallpapers"
     )
     title = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, max_length=255)
     image = models.ImageField(upload_to=wallpaper_upload_to)
     image_preview = ImageSpecField(
         source="image",

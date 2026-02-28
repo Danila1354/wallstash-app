@@ -27,7 +27,7 @@ services:
     volumes:
       - ./backend-django/wallstash/:/app
       - static_volume:/app/static
-      - media_volume:/app/media
+      - ./backend-django/wallstash/media:/app/media
     ports:
       - "8000:8000"
     env_file:

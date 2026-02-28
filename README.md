@@ -20,50 +20,42 @@
 - Python 3.11+
 - PostgreSQL 15+
 
-### Быстрый старт
+# Быстрый старт с Docker
 
-1. **Клонировать репозиторий**
-```bash
-git clone https://github.com/yourusername/wallstash.git
-cd wallstash-app/backend-django/wallstash
+## 1. Клонировать репозиторий
+```
+git clone https://github.com/Danila1354/wallstash-app.git
+cd wallstash-app
 ```
 
-2. **Создать виртуальное окружение и установить зависимости**
-```bash
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+2. **Создать .env из примера**
 ```
+cd backend-django/wallstash
+cp .env.example .env
+```  
+Отредактируйте .env, указав свои значения.
 
-3. **Создать базу данных PostgreSQL**
-```sql
-CREATE DATABASE wallstash;
-CREATE USER wallstash_user WITH PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE wallstash TO wallstash_user;
+3. **Запустить Docker Compose**
 ```
+docker compose up -d --build
+```
+После этого:  
+	•	PostgreSQL создаст базу и пользователя автоматически  
+	•	Django применит миграции и запустится на http://localhost:8000
 
-4. **Настроить переменные окружения**
-
-Создайте файл `.env` в папке backend-django/wallstash:
+4. **Создать суперпользователя**
 ```env
-DJANGO_SECRET_KEY=your-secret-key
-DEBUG=True
-DB_NAME=wallstash
-DB_USER=wallstash_user
-DB_PASSWORD=your_password
-DB_HOST=localhost
-DB_PORT=5432
+docker compose exec backend python manage.py createsuperuser
 ```
 
-5. **Применить миграции и создать суперпользователя**
-```bash
-python manage.py migrate
-python manage.py createsuperuser
+5. **Парсинг обоев с Telegram (опционально)**
+```
+docker compose exec backend python manage.py parse_telegram --channel @tag_channel --limit 50
 ```
 
-6. **Запустить сервер**
-```bash
-python manage.py runserver
+6. **Остановка проекта**
+```
+docker compose down
 ```
 
 API доступен по адресу `http://localhost:8000/api/v1/`

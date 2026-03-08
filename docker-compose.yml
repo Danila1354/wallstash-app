@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   db:
     image: postgres:15
     container_name: wallstash_db
@@ -16,6 +17,18 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: wallstash_rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
 
   backend:
     build: ./backend-django/wallstash
@@ -35,8 +48,23 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      rabbitmq:
+        condition: service_started
+  celery:
+    build: ./backend-django/wallstash
+    container_name: wallstash_celery
+    restart: always
+    command: celery -A wallstash worker -l info
+    volumes:
+      - ./backend-django/wallstash/:/app
+    env_file:
+      - ./backend-django/wallstash/.env
+    depends_on:
+      - rabbitmq
+      - db
 
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+  rabbitmq_data:

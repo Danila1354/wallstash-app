@@ -13,26 +13,43 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
-from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView, SpectacularAPIView
-
+from drf_spectacular.views import (
+    SpectacularSwaggerView,
+    SpectacularRedocView,
+    SpectacularAPIView,
+)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
-    path('api/v1/', include([
-        path('', include('wallpapers.urls')),
-        path('', include('users.urls')),
-        path('auth/', include('djoser.urls')),
-        path('auth/', include('djoser.urls.jwt')),
-        path('schema/', SpectacularAPIView.as_view(), name='schema'),
-        path('schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-        path('schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    ])),
-    
+    path("admin/", admin.site.urls),
+    path("api-auth/", include("rest_framework.urls")),
+    path(
+        "api/v1/",
+        include(
+            [
+                path("", include("wallpapers.urls")),
+                path("", include("telegram_parser.urls")),
+                path("", include("users.urls")),
+                path("auth/", include("djoser.urls")),
+                path("auth/", include("djoser.urls.jwt")),
+                path("schema/", SpectacularAPIView.as_view(), name="schema"),
+                path(
+                    "schema/swagger-ui/",
+                    SpectacularSwaggerView.as_view(url_name="schema"),
+                    name="swagger-ui",
+                ),
+                path(
+                    "schema/redoc/",
+                    SpectacularRedocView.as_view(url_name="schema"),
+                    name="redoc",
+                ),
+            ]
+        ),
+    ),
 ]
 
 if settings.DEBUG:

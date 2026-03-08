@@ -24,6 +24,12 @@ class Category(models.Model):
         verbose_name_plural = "Categories"
 
 
+@receiver(pre_save, sender=Category)
+def generate_category_slug(sender, instance, **kwargs):
+    if not instance.slug:
+        instance.slug = slugify(instance.name)
+
+
 class Wallpaper(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="wallpapers"

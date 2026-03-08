@@ -21,7 +21,9 @@ class TelegramService:
         """Генератор, который возвращает файлы по одному."""
         with self.client:
             for message in self.client.iter_messages(channel, limit=limit):
-                if not message.media or not isinstance(message.media, MessageMediaDocument):
+                if not message.media or not isinstance(
+                    message.media, MessageMediaDocument
+                ):
                     continue
 
                 filename = message.file.name or f"{message.id}.dat"
@@ -31,6 +33,8 @@ class TelegramService:
 
                 bio = BytesIO()
                 bio.name = filename
-                self.client.loop.run_until_complete(self.client.download_media(message.media, file=bio))
+                self.client.loop.run_until_complete(
+                    self.client.download_media(message.media, file=bio)
+                )
                 bio.seek(0)
                 yield bio, filename

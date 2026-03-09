@@ -12,17 +12,21 @@
 - 📚 Персональные коллекции
 - 📥 Отслеживание скачиваний
 - 🔍 Поиск и фильтрация
+- 🤖 Асинхронный парсинг Telegram-каналов с обоями (Celery + RabbitMQ)
+## ⚙️ Стек
+Проект использует:  
+- Django + Django REST Framework
+- PostgreSQL
+- Celery
+- RabbitMQ
+- Docker + Docker Compose
 
+Celery используется для фонового парсинга Telegram каналов.
 ## 🚀 Установка
 
-### Требования
+### Быстрый старт с Docker
 
-- Python 3.11+
-- PostgreSQL 15+
-
-# Быстрый старт с Docker
-
-## 1. Клонировать репозиторий
+1. Клонировать репозиторий
 ```
 git clone https://github.com/Danila1354/wallstash-app.git
 cd wallstash-app
@@ -48,12 +52,7 @@ docker compose up -d --build
 docker compose exec backend python manage.py createsuperuser
 ```
 
-5. **Парсинг обоев с Telegram (опционально)**
-```
-docker compose exec backend python manage.py parse_telegram --channel @tag_channel --limit 50
-```
-
-6. **Остановка проекта**
+5. **Остановка проекта**
 ```
 docker compose down
 ```
@@ -88,3 +87,5 @@ API доступен по адресу `http://localhost:8000/api/v1/`
 - `POST /api/v1/profile/{user_id}/collections/` - Создать коллекцию
 - `POST /api/v1/profile/{user_id}/collections/add_wallpaper` - Добавить обои в коллекцию
 - `POST /api/v1/profile/{user_id}/collections/remove_wallpaper` - УДалить обои из коллекции
+### Парсинг обоев с Telegram каналов
+- `POST /api/v1/parse-channel/` - Выполнить парсинг

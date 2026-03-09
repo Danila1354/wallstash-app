@@ -3,6 +3,7 @@ from io import BytesIO
 from telethon import TelegramClient
 from telethon.tl.types import MessageMediaDocument
 from dotenv import load_dotenv
+from typing import Iterator, Tuple
 
 load_dotenv()
 
@@ -13,11 +14,13 @@ ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
 
 class TelegramService:
-    def __init__(self):
+    def __init__(self) -> None:
         self.client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
         self.client.start()
 
-    def iter_channel_images(self, channel: str, limit: int = 50):
+    def iter_channel_images(
+        self, channel: str, limit: int = 20
+    ) -> Iterator[Tuple[BytesIO, str]]:
         """Генератор, который возвращает файлы по одному."""
         with self.client:
             for message in self.client.iter_messages(channel, limit=limit):

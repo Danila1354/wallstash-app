@@ -2,11 +2,11 @@ from celery import shared_task
 from django.core.files import File
 
 from wallpapers.models import Wallpaper, Category
-from telegram_parser.services.telegram_parser import TelegramService
+from .services.telegram_parser import TelegramService
 
 
 @shared_task
-def parse(channel, limit):
+def parse(channel: str, limit: int) -> None:
     category_name = channel.lstrip("@")
     category, created_cat = Category.objects.get_or_create(name=category_name)
 

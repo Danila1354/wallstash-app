@@ -1,8 +1,10 @@
 from datetime import datetime
 import os
 
+from .models import Wallpaper
 
-def wallpaper_upload_to(instance, filename):
+
+def wallpaper_upload_to(instance: Wallpaper, filename: str) -> str:
     ext = filename.split(".")[-1]
     unique_filename = f"{instance.slug}.{ext}"
     now = datetime.now()

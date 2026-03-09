@@ -1,11 +1,18 @@
+from typing import Any, Optional, List, Dict
+
 from rest_framework import viewsets
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+    BasePermission,
+)
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import mixins
 from django.shortcuts import get_object_or_404
-from django.db.models import F
+from django.db.models import F, QuerySet
 from django.http import FileResponse
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
@@ -24,7 +31,7 @@ class WallpaperViewSet(viewsets.ModelViewSet):
     filterset_class = WallpaperFilter
     search_fields = ["title", "tags__name"]
 
-    def get_serializer_context(self):
+    def get_serializer_context(self) -> Dict[str, Any]:
         context = super().get_serializer_context()
         user = self.request.user
         if user.is_authenticated:
@@ -38,16 +45,16 @@ class WallpaperViewSet(viewsets.ModelViewSet):
             context["user_likes"] = set()
         return context
 
-    def get_permissions(self):
+    def get_permissions(self) -> List[BasePermission]:
         if self.action == "create":
             return [IsAuthenticated()]
         return [IsOwnerOrReadOnly()]
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: WallpaperSerializer) -> None:
         serializer.save(user=self.request.user)
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
-    def like(self, request, slug=None):
+    def like(self, request: Request, slug: Optional[str] = None) -> Response:
         """Поставить лайк обоям."""
         wallpaper = self.get_object()
         user = request.user
@@ -79,7 +86,7 @@ class WallpaperViewSet(viewsets.ModelViewSet):
         )
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
-    def unlike(self, request, slug=None):
+    def unlike(self, request: Request, slug: Optional[str] = None) -> Response:
         """Убрать лайк с обоев."""
         wallpaper = self.get_object()
         user = request.user
@@ -111,7 +118,7 @@ class WallpaperViewSet(viewsets.ModelViewSet):
             )
 
     @action(detail=True, methods=["get"], permission_classes=[IsAuthenticated])
-    def download(self, request, slug=None):
+    def download(self, request: Request, slug: Optional[str] = None) -> FileResponse:
         wallpaper = self.get_object()
         Wallpaper.objects.filter(slug=wallpaper.slug).update(
             downloads_count=F("downloads_count") + 1
@@ -132,13 +139,13 @@ class CommentViewSet(
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Comment]:
         return (
             Comment.objects.filter(wallpaper__slug=self.kwargs["wallpaper_slug"])
             .select_related("user")
             .order_by("created_at")
         )
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: CommentSerializer) -> None:
         wallpaper = get_object_or_404(Wallpaper, slug=self.kwargs["wallpaper_slug"])
         serializer.save(user=self.request.user, wallpaper=wallpaper)

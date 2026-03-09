@@ -1,6 +1,10 @@
+from django.db.models import QuerySet
+from typing import Optional
 from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.request import Request
+
 from wallpapers.permissions import IsOwnerOrReadOnly
 from wallpapers.models import Wallpaper
 from wallpapers.serializers import (
@@ -18,7 +22,7 @@ class UserCollectionViewSet(viewsets.ModelViewSet):
     serializer_class = CollectionSerializer
     permission_classes = [IsOwnerOrReadOnly]
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Collection]:
         user_id = self.kwargs.get("user_pk")
         return (
             Collection.objects.filter(user_id=user_id)
@@ -26,7 +30,7 @@ class UserCollectionViewSet(viewsets.ModelViewSet):
             .prefetch_related("wallpapers")
         )
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: CollectionSerializer) -> None:
         serializer.save(user=self.request.user)
 
     @action(
@@ -35,7 +39,9 @@ class UserCollectionViewSet(viewsets.ModelViewSet):
         permission_classes=[IsOwnerOrReadOnly],
         serializer_class=AddWallpaperSerializer,
     )
-    def add_wallpaper(self, request, user_pk=None, pk=None):
+    def add_wallpaper(
+        self, request: Request, user_pk: Optional[int], pk: Optional[int] = None
+    ) -> Response:
         collection = self.get_object()
 
         serializer = self.get_serializer(data=request.data)
@@ -58,7 +64,9 @@ class UserCollectionViewSet(viewsets.ModelViewSet):
         permission_classes=[IsOwnerOrReadOnly],
         serializer_class=UploadWallpaperSerializer,
     )
-    def upload_wallpaper(self, request, user_pk=None, pk=None):
+    def upload_wallpaper(
+        self, request: Request, user_pk: Optional[int] = None, pk: Optional[int] = None
+    ) -> Response:
         collection = self.get_object()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

@@ -52,23 +52,23 @@ class WallpaperSerializer(TaggitSerializer, serializers.ModelSerializer):
             "orientation",
         ]
 
-    def get_liked_by_user(self, obj):
+    def get_liked_by_user(self, obj: Wallpaper) -> bool:
         user_likes = self.context.get("user_likes", set())
         return obj.id in user_likes
 
-    def get_file_size_human(self, obj):
+    def get_file_size_human(self, obj: Wallpaper) -> str:
         return filesizeformat(obj.file_size)
 
-    def get_username(self, obj):
+    def get_username(self, obj: Wallpaper) -> str:
         return obj.user.username
 
-    def get_detail_link(self, obj):
+    def get_detail_link(self, obj: Wallpaper) -> str:
         request = self.context.get("request")
         if request:
             return request.build_absolute_uri(obj.get_absolute_url())
         return obj.get_absolute_url()
 
-    def get_download_link(self, obj):
+    def get_download_link(self, obj: Wallpaper) -> str:
         request = self.context.get("request")
         return reverse("wallpaper-download", kwargs={"slug": obj.slug}, request=request)
 
@@ -87,8 +87,10 @@ class CommentSerializer(serializers.ModelSerializer):
 class AddWallpaperSerializer(serializers.Serializer):
     wallpaper_id = serializers.IntegerField()
 
+
 class UploadWallpaperSerializer(serializers.ModelSerializer):
     tags = TagListSerializerField()
+
     class Meta:
         model = Wallpaper
         fields = [

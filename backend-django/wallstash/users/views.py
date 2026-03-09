@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -15,7 +16,7 @@ User = get_user_model()
 
 
 class UserProfileView(viewsets.ModelViewSet):
-    
+
     queryset = User.objects.prefetch_related("followers", "following")
     permission_classes = [IsSelfOrReadOnly]
     serializer_class = UserProfileSerializer
@@ -24,7 +25,7 @@ class UserProfileView(viewsets.ModelViewSet):
         methods=["get"],
         detail=True,
     )
-    def followers(self, request, pk=None):
+    def followers(self, request: Request, pk: int | None = None) -> Response:
         """Возвращает список пользователей, подписанных на данного пользователя."""
         user = self.get_object()
         followers = user.followers.all()
@@ -35,7 +36,7 @@ class UserProfileView(viewsets.ModelViewSet):
         methods=["get"],
         detail=True,
     )
-    def following(self, request, pk=None):
+    def following(self, request: Request, pk: int | None = None) -> Response:
         """Возвращает список пользователей, на которых подписан данный пользователь."""
         user = self.get_object()
         following = user.following.all()
@@ -43,7 +44,7 @@ class UserProfileView(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=["post"], detail=True, permission_classes=[IsAuthenticated])
-    def follow(self, request, pk=None):
+    def follow(self, request: Request, pk: int | None = None) -> Response:
         """Подписаться на пользователя"""
         target = self.get_object()
         user = request.user
@@ -77,7 +78,7 @@ class UserProfileView(viewsets.ModelViewSet):
         )
 
     @action(methods=["post"], detail=True, permission_classes=[IsAuthenticated])
-    def unfollow(self, request, pk=None):
+    def unfollow(self, request: Request, pk: int | None = None) -> Response:
         """Отписаться от пользователя"""
         target = self.get_object()
         user = request.user
@@ -105,29 +106,31 @@ class UserProfileView(viewsets.ModelViewSet):
         )
 
     @action(detail=False, permission_classes=[IsAuthenticated])
-    def me(self, request):
+    def me(self, request: Request) -> Response:
         """Данные текущего пользователя"""
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
-    @action(detail=False, permission_classes=[IsAuthenticated], url_path='me/followers')
-    def my_followers(self, request):
+    @action(detail=False, permission_classes=[IsAuthenticated], url_path="me/followers")
+    def my_followers(self, request: Request) -> Response:
         """Список подписчиков текущего пользователя"""
         followers = request.user.followers.all()
         serializer = UserProfileSerializer(followers, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, permission_classes=[IsAuthenticated], url_path='me/following')
-    def my_following(self, request):
+    @action(detail=False, permission_classes=[IsAuthenticated], url_path="me/following")
+    def my_following(self, request: Request) -> Response:
         """Список пользователей, на которых подписан текущий пользователь."""
         following = request.user.following.all()
         serializer = UserProfileSerializer(following, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=True, methods=["get"])
-    def wallpapers(self, request, pk=None):
+    def wallpapers(self, request: Request, pk: int | None = None) -> Response:
         """Список обоев пользователя"""
         user = self.get_object()
         wallpapers = Wallpaper.objects.filter(user=user).order_by("-uploaded_at")
-        serializer = WallpaperSerializer(wallpapers, many=True, context={"request": request})
+        serializer = WallpaperSerializer(
+            wallpapers, many=True, context={"request": request}
+        )
         return Response(serializer.data)

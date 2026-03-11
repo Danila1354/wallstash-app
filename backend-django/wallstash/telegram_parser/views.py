@@ -7,7 +7,7 @@ from .tasks import parse
 
 
 class ParseView(APIView):
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser]
 
     def post(self, request: Request) -> Response:
         channel = request.data.get("channel")

@@ -1,0 +1,26 @@
+@use '../../styles/variables' as *;
+
+.wrapper {
+  position: relative;
+  width: 480px;
+}
+
+.icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 20px 12px 40px;
+  background-color: $input-color;
+  border-radius: 24px;
+  outline: none;
+  border: none;
+}
+.searchInput:focus {
+  box-shadow: 0 0 0 2px #35383e;
+}

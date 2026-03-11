@@ -1,0 +1,54 @@
+@use '../../styles/variables' as *;
+
+.header {
+  background: $primary-color;
+  position: fixed;
+  top: 0;
+  height: 84px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.logoText {
+  color: $accent-color;
+  font-weight: bold;
+
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.loginButton {
+  border-radius: 8px;
+  background-color: $primary-color;
+  color: $accent-color;
+  border: 1px solid $accent-color;
+  padding: 12px 32px;
+}
+
+.registerButton {
+  border-radius: 8px;
+  background-color: $accent-color;
+  color: $primary-color;
+  border: none;
+  padding: 12px 32px;
+}

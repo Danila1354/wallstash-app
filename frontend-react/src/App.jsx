@@ -1,18 +1,20 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Header from "./components/Header/Header.jsx";
 
 function App() {
 
   return (
       <BrowserRouter>
-          <div className="container">
-              <div className="app">
-                  <main>
+          <Header />
+          <main>
+              <div className="container">
+                  <div className="app">
                       <Routes>
                           {/*<Route path="/" element={<BrokersPage />} />*/}
                       </Routes>
-                  </main>
+                  </div>
               </div>
-          </div>
+          </main>
       </BrowserRouter>
   )
 }

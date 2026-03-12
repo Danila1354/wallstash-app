@@ -1,0 +1,31 @@
+@use "../../styles/variables" as *;
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  margin-top: 60px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: bold;
+  color: white;
+}
+
+.link {
+  display: block;
+  font-size: 14px;
+  text-decoration: none;
+  color: $accent-alt-color;
+  transition: all 0.2s ease;
+  border: 1px solid $accent-alt-color;
+  padding: 10px 20px;
+  border-radius: 8px;
+}
+
+.link:hover {
+  background-color: $accent-alt-color;
+  color: $primary-color;
+}

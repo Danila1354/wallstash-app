@@ -1,0 +1,10 @@
+@use "../../../styles/variables" as *;
+
+.card{
+  background-color: $primary-color;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 280px;
+  height: 180px;
+}

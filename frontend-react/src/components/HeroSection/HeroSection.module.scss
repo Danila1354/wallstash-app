@@ -1,0 +1,36 @@
+@use '../../styles/variables' as *;
+
+.hero {
+  background: linear-gradient(to bottom right, $primary-color, $background-color);
+  height: 100vh;
+  padding-top: 60px;
+}
+
+.heroTitle{
+  font-size: 48px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 0;
+}
+
+.heroSubtitle{
+  color: $secondary-color;
+  font-size: 18px;
+  margin-top: 16px;
+}
+
+.heroText{
+  display: flex;
+  flex-direction: column;
+}
+
+.heroImageContainer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.heroImageContainer img{
+  max-width: 740px;
+}

@@ -1,22 +1,20 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {BrowserRouter, Routes, Route} from "react-router-dom";
 import Header from "./components/Header/Header.jsx";
+import HomePage from "./pages/HomePage/HomePage.jsx";
 
 function App() {
+    return (
+        <BrowserRouter>
+            <Header/>
 
-  return (
-      <BrowserRouter>
-          <Header />
-          <main>
-              <div className="container">
-                  <div className="app">
-                      <Routes>
-                          {/*<Route path="/" element={<BrokersPage />} />*/}
-                      </Routes>
-                  </div>
-              </div>
-          </main>
-      </BrowserRouter>
-  )
+            <main>
+                <Routes>
+                    <Route path="/" element={<HomePage/>}/>
+                </Routes>
+            </main>
+
+        </BrowserRouter>
+    );
 }
 
-export default App
+export default App;

@@ -19,25 +19,30 @@ class TelegramService:
         self.client.start()
 
     def iter_channel_images(
-        self, channel: str, limit: int = 20
-    ) -> Iterator[Tuple[BytesIO, str]]:
+        self, channel: str, limit: int = 20, offset_id: int | None = None
+    ) -> Iterator[Tuple[BytesIO, str, int]]:
         """Генератор, который возвращает файлы по одному."""
-        with self.client:
-            for message in self.client.iter_messages(channel, limit=limit):
-                if not message.media or not isinstance(
-                    message.media, MessageMediaDocument
-                ):
-                    continue
+        if not offset_id:
+            offset_id = 0
+        count = 0
+        for message in self.client.iter_messages(
+            channel, reverse=True, offset_id=offset_id
+        ):
+            if not isinstance(message.media, MessageMediaDocument):
+                continue
 
-                filename = message.file.name or f"{message.id}.dat"
-                ext = os.path.splitext(filename)[1].lower()
-                if ext not in ALLOWED_EXTENSIONS:
-                    continue
+            filename = message.file.name or f"{message.id}.dat"
+            ext = os.path.splitext(filename)[1].lower()
+            if ext not in ALLOWED_EXTENSIONS:
+                continue
 
-                bio = BytesIO()
-                bio.name = filename
-                self.client.loop.run_until_complete(
-                    self.client.download_media(message.media, file=bio)
-                )
-                bio.seek(0)
-                yield bio, filename
+            bio = BytesIO()
+            bio.name = filename
+            self.client.loop.run_until_complete(
+                self.client.download_media(message.media, file=bio)
+            )
+            bio.seek(0)
+            yield bio, filename, message.id
+            count += 1
+            if count >= limit:
+                break

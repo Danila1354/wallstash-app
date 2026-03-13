@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.template.defaultfilters import filesizeformat
+from django.utils.html import format_html
+
 from .models import Wallpaper, Category
 
 
@@ -7,6 +9,7 @@ from .models import Wallpaper, Category
 class WallpaperAdmin(admin.ModelAdmin):
     list_display = (
         "title",
+        "preview",
         "user",
         "category",
         "uploaded_at",
@@ -27,6 +30,7 @@ class WallpaperAdmin(admin.ModelAdmin):
         "updated_at",
         "resolution",
         "file_size_human",
+        "image_preview",
     )
     fieldsets = (
         (
@@ -37,6 +41,7 @@ class WallpaperAdmin(admin.ModelAdmin):
                     "slug",
                     "user",
                     "category",
+                    "image_preview",
                     "image",
                     "tags",
                 )
@@ -71,6 +76,15 @@ class WallpaperAdmin(admin.ModelAdmin):
         ),
     )
 
+    @admin.display(description="Preview")
+    def preview(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-height: 50px; max-width: 50px;" />',
+                obj.image.url,
+            )
+        return "-"
+
     @admin.display(description="Resolution")
     def resolution(self, obj):
         if not obj.width or not obj.height:
@@ -82,6 +96,15 @@ class WallpaperAdmin(admin.ModelAdmin):
         if not obj.file_size:
             return "-"
         return filesizeformat(obj.file_size)
+
+    @admin.display(description="Preview")
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-height: 400px; max-width: 400px;" />',
+                obj.image.url,
+            )
+        return "-"
 
 
 @admin.register(Category)

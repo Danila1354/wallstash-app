@@ -4,6 +4,7 @@ from telethon.errors import FloodWaitError, RpcCallFailError, FloodError
 
 from wallpapers.models import Wallpaper, Category
 from .services.telegram_parser import TelegramService
+from .models import TelegramChannel
 
 
 @shared_task(
@@ -17,9 +18,15 @@ def parse(self, channel: str, limit: int) -> None:
     category, created_cat = Category.objects.get_or_create(name=category_name)
 
     service = TelegramService()
+    channel_obj, created_tg = TelegramChannel.objects.get_or_create(
+        username=channel, defaults={"username": channel}
+    )
+    last_message_id = channel_obj.last_message_id
 
     try:
-        for bio, filename in service.iter_channel_images(channel, limit=limit):
+        for bio, filename, message_id in service.iter_channel_images(
+            channel, limit=limit, offset_id=last_message_id
+        ):
             with bio:
                 django_file = File(bio, name=filename)
 
@@ -31,6 +38,8 @@ def parse(self, channel: str, limit: int) -> None:
                         "category": category,
                     },
                 )
+                channel_obj.last_message_id = message_id
+                channel_obj.save(update_fields=["last_message_id"])
 
     except FloodWaitError as e:
         raise self.retry(countdown=e.seconds)
